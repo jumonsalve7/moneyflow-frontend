@@ -1,0 +1,118 @@
+.search-form {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 400px;
+  margin: 20px auto;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.search-form__title {
+  margin: 0 0 10px 0;
+  font-size: 1.25rem;
+  color: #333333;
+  font-family: inherit;
+}
+
+.search-form__field {
+  display: flex;
+  flex-direction: column;
+}
+
+.search-form__input,
+.search-form__select {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.search-form__input:focus,
+.search-form__select:focus {
+  border-color: #007bff;
+}
+
+/* Modifier for custom category input */
+.search-form__input_type_custom {
+  border-color: #007bff;
+  background-color: #f0f7ff;
+}
+
+/* Actions container (Save and Cancel buttons layout) */
+.search-form__actions {
+  display: flex;
+  gap: 10px;
+}
+
+.search-form__button {
+  flex: 2;
+  background-color: #007bff;
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.search-form__button:hover {
+  background-color: #0056b3;
+}
+
+.search-form__button:active {
+  transform: scale(0.98);
+}
+
+.search-form__cancel-button {
+  flex: 1;
+  background-color: #6c757d;
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.search-form__cancel-button:hover {
+  background-color: #5a6268;
+}
+
+.search-form__cancel-button:active {
+  transform: scale(0.98);
+}
+
+/* Green toggle button container and styles (when form is hidden) */
+.search-form__toggle-container {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.search-form__toggle-button {
+  background-color: #2e7d32;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.search-form__toggle-button:hover {
+  background-color: #1b5e20;
+}
+
+.search-form__toggle-button:active {
+  transform: scale(0.95);
+}
