@@ -1,0 +1,55 @@
+/* BLOQUE: dashboard stats */
+.dashboard__stats-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.dashboard__stat-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard__stat-title {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.9rem;
+  color: #666;
+  text-transform: uppercase;
+}
+
+.dashboard__stat-amount {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.dashboard__stat-amount--income {
+  color: #4caf50;
+}
+
+.dashboard__stat-amount--expense {
+  color: #f44336;
+}
+
+.dashboard__stat-amount--positive {
+  color: #4caf50;
+}
+
+.dashboard__stat-amount--negative {
+  color: #f44336;
+}
+
+.dashboard__info {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.dashboard__stats {
+  font-size: 0.9rem;
+  color: #666;
+  margin: 0;
+}

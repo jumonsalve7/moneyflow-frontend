@@ -1,131 +1,116 @@
 import { useState } from 'react';
 import './SearchForm.css';
 
-function SearchForm({ onAddExpense }) {
-  const [isOpen, setIsOpen] = useState(false);
+function SearchForm({ onSearch, onFilterCategory, onFilterDateRange }) {
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
 
-  const [name, setName] = useState('');
-  const [amount, setAmount] = useState('');
-  const [category, setCategory] = useState('Food');
-  const [customCategory, setCustomCategory] = useState('');
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!name || !amount || !date) return;
-
-    const finalCategory = category === 'custom' ? customCategory : category;
-    if (category === 'custom' && !customCategory.trim()) return;
-
-    const newExpense = {
-      id: crypto.randomUUID(),
-      name: name,
-      amount: parseFloat(amount),
-      category: finalCategory,
-      date: new Date(date).toLocaleDateString()
-    };
-
-    onAddExpense(newExpense);
-
-    setName('');
-    setAmount('');
-    setCustomCategory('');
-    setCategory('Food');
-    setDate(new Date().toISOString().split('T')[0]);
-    
-    setIsOpen(false);
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    onSearch(value);
   };
 
-  if (!isOpen) {
-    return (
-      <div className="search-form__toggle-container">
-        <button 
-          type="button" 
-          className="search-form__toggle-button"
-          onClick={() => setIsOpen(true)}
-        >
-          + Add New Expense
-        </button>
-      </div>
-    );
-  }
+  const handleCategoryChange = (e) => {
+    const value = e.target.value;
+    setSelectedCategory(value);
+    onFilterCategory(value);
+  };
+
+  const handleStartDateChange = (e) => {
+    const value = e.target.value;
+    setStartDate(value);
+    onFilterDateRange(value, endDate);
+  };
+
+  const handleEndDateChange = (e) => {
+    const value = e.target.value;
+    setEndDate(value);
+    onFilterDateRange(startDate, value);
+  };
+
+  const handleClearFilters = () => {
+    setSearchTerm('');
+    setSelectedCategory('all');
+    setStartDate('');
+    setEndDate('');
+    onSearch('');
+    onFilterCategory('all');
+    onFilterDateRange('', '');
+  };
+
+  const toggleFilters = () => {
+    setIsFiltersOpen(!isFiltersOpen);
+  };
 
   return (
-    <form className="search-form" onSubmit={handleSubmit}>
-      {/* Tu título original e intacto arriba */}
-      <h3 className="search-form__title">Add New Expense</h3>
-      
-      <div className="search-form__field">
-        <input 
-          type="text" 
-          className="search-form__input" 
-          placeholder="Expense name (e.g., Groceries)"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
-      </div>
+    <div className="search-form">
+      <button 
+        className="search-form__toggle-btn"
+        onClick={toggleFilters}
+      >
+        {isFiltersOpen ? '▲ Hide Filters' : '🔍 Show Filters'}
+      </button>
 
-      <div className="search-form__field">
-        <input 
-          type="number" 
-          className="search-form__input" 
-          placeholder="Amount ($)"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          required
-        />
-      </div>
+      {isFiltersOpen && (
+        <div className="search-form__filters">
+          <div className="search-form__field">
+            <input
+              type="text"
+              className="search-form__input"
+              placeholder="Search by name..."
+              value={searchTerm}
+              onChange={handleSearchChange}
+            />
+          </div>
 
-      <div className="search-form__field">
-        <input 
-          type="date" 
-          className="search-form__input" 
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          required
-        />
-      </div>
+          <div className="search-form__field">
+            <select
+              className="search-form__select"
+              value={selectedCategory}
+              onChange={handleCategoryChange}
+            >
+              <option value="all">All Categories</option>
+              <option value="Food">Food</option>
+              <option value="Transport">Transport</option>
+              <option value="Utilities">Utilities</option>
+              <option value="Entertainment">Entertainment</option>
+            </select>
+          </div>
 
-      <div className="search-form__field">
-        <select 
-          className="search-form__select"
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-        >
-          <option value="Food">Food</option>
-          <option value="Transport">Transport</option>
-          <option value="Utilities">Utilities</option>
-          <option value="Entertainment">Entertainment</option>
-          <option value="custom">✨ Create category...</option>
-        </select>
-      </div>
+          <div className="search-form__date-range">
+            <div className="search-form__field">
+              <label>From:</label>
+              <input
+                type="date"
+                className="search-form__input"
+                value={startDate}
+                onChange={handleStartDateChange}
+              />
+            </div>
+            <div className="search-form__field">
+              <label>To:</label>
+              <input
+                type="date"
+                className="search-form__input"
+                value={endDate}
+                onChange={handleEndDateChange}
+              />
+            </div>
+          </div>
 
-      {category === 'custom' && (
-        <div className="search-form__field">
-          <input 
-            type="text" 
-            className="search-form__input search-form__input_type_custom" 
-            placeholder="Write your custom category"
-            value={customCategory}
-            onChange={(e) => setCustomCategory(e.target.value)}
-            required
-          />
+          <button 
+            className="search-form__clear-btn"
+            onClick={handleClearFilters}
+          >
+            Clear Filters
+          </button>
         </div>
       )}
-
-      {/* Agrupamos los botones al final para que no rompan el diseño del formulario */}
-      <div className="search-form__actions">
-        <button type="submit" className="search-form__button">Add Expense</button>
-        <button 
-          type="button" 
-          className="search-form__cancel-button"
-          onClick={() => setIsOpen(false)}
-        >
-          Cancel
-        </button>
-      </div>
-    </form>
+    </div>
   );
 }
 
