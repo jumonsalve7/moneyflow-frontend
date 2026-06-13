@@ -131,3 +131,11 @@
     width: 100%;
   }
 }
+
+.transaction-card__original-amount {
+  display: block;
+  font-size: 0.7rem;
+  color: #999;
+  margin-top: 0.25rem;
+  font-style: italic;
+}
