@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import './AddTransactionForm.css';
+import useCurrencyConverter from '../../hooks/useCurrencyConverter';
 
 function AddTransactionForm({ onAddTransaction }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -8,34 +9,72 @@ function AddTransactionForm({ onAddTransaction }) {
   const [type, setType] = useState('expense');
   const [category, setCategory] = useState('Food');
   const [customCategory, setCustomCategory] = useState('');
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]); 
+  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [currency, setCurrency] = useState('USD');
+  const [isConverting, setIsConverting] = useState(false);
+  
+  const { convertCurrency, rates, loading } = useCurrencyConverter();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!name || !amount || !date) return;
 
     const finalCategory = category === 'custom' ? customCategory : category;
     if (category === 'custom' && !customCategory.trim()) return;
 
-    const newTransaction = {
-      id: crypto.randomUUID(),
-      name: name,
-      amount: parseFloat(amount),
-      type: type,
-      category: finalCategory,
-      date: date, 
-      isLiked: false
-    };
+    const amountValue = parseFloat(amount);
+    setIsConverting(true);
+    
+    try {
+      // ✅ Convertir el monto a USD si es necesario (usando await)
+      let amountInUSD = amountValue;
+      if (currency !== 'USD') {
+        if (rates) {
+          // Usar la API para conversión precisa
+          amountInUSD = await convertCurrency(amountValue, currency, 'USD');
+          console.log(`💰 Converting ${amountValue} ${currency} → ${amountInUSD} USD`);
+        } else {
+          // Fallback si no hay tasas disponibles
+          const fallbackRates = { 
+            USD: 1, 
+            EUR: 1.08, 
+            GBP: 1.27, 
+            COP: 0.00026 
+          };
+          amountInUSD = amountValue * fallbackRates[currency];
+          console.warn(`⚠️ Using fallback rate: ${amountValue} ${currency} → ${amountInUSD} USD`);
+        }
+      }
 
-    onAddTransaction(newTransaction);
+      const newTransaction = {
+        name: name,
+        amount: parseFloat(amountInUSD.toFixed(2)),
+        originalAmount: amountValue,
+        originalCurrency: currency,
+        type: type,
+        category: finalCategory,
+        date: date,
+        isLiked: false
+      };
 
-    setName('');
-    setAmount('');
-    setType('expense');
-    setCustomCategory('');
-    setCategory('Food');
-    setDate(new Date().toISOString().split('T')[0]);
-    setIsOpen(false);
+      console.log('📦 Saving transaction:', newTransaction);
+      await onAddTransaction(newTransaction);
+
+      // Reset form
+      setName('');
+      setAmount('');
+      setType('expense');
+      setCustomCategory('');
+      setCategory('Food');
+      setDate(new Date().toISOString().split('T')[0]);
+      setCurrency('USD');
+      setIsOpen(false);
+    } catch (error) {
+      console.error('Error converting currency:', error);
+      alert('Error converting currency. Please try again.');
+    } finally {
+      setIsConverting(false);
+    }
   };
 
   if (!isOpen) {
@@ -56,6 +95,7 @@ function AddTransactionForm({ onAddTransaction }) {
     <form className="add-transaction-form" onSubmit={handleSubmit}>
       <h3 className="add-transaction-form__title">Add New Transaction</h3>
       
+      {/* Selector de tipo (Income/Expense) */}
       <div className="add-transaction-form__field">
         <label className="add-transaction-form__label">Transaction Type:</label>
         <div className="add-transaction-form__type-group">
@@ -91,15 +131,36 @@ function AddTransactionForm({ onAddTransaction }) {
         />
       </div>
 
+      {/* Monto con selector de moneda */}
       <div className="add-transaction-form__field">
-        <input 
-          type="number" 
-          className="add-transaction-form__input" 
-          placeholder="Amount ($)"
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
-          required
-        />
+        <label className="add-transaction-form__label">Amount:</label>
+        <div className="add-transaction-form__amount-group">
+          <input 
+            type="number" 
+            step="0.01"
+            className="add-transaction-form__input add-transaction-form__input--amount" 
+            placeholder="0.00"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            required
+          />
+          <select 
+            className="add-transaction-form__currency-select"
+            value={currency}
+            onChange={(e) => setCurrency(e.target.value)}
+            disabled={loading}
+          >
+            <option value="USD">USD ($)</option>
+            <option value="EUR">EUR (€)</option>
+            <option value="GBP">GBP (£)</option>
+            <option value="COP">COP (COL$)</option>
+          </select>
+        </div>
+        {loading && (
+          <small className="add-transaction-form__rate-warning">
+            Loading exchange rates...
+          </small>
+        )}
       </div>
 
       <div className="add-transaction-form__field">
@@ -142,7 +203,13 @@ function AddTransactionForm({ onAddTransaction }) {
       )}
 
       <div className="add-transaction-form__actions">
-        <button type="submit" className="add-transaction-form__button">Add Transaction</button>
+        <button 
+          type="submit" 
+          className="add-transaction-form__button"
+          disabled={isConverting || loading}
+        >
+          {isConverting ? 'Converting...' : 'Add Transaction'}
+        </button>
         <button 
           type="button" 
           className="add-transaction-form__cancel-button"

@@ -118,3 +118,22 @@
 .add-transaction-form__cancel-button:hover {
   background-color: #da190b;
 }
+
+.add-transaction-form__amount-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.add-transaction-form__input--amount {
+  flex: 2;
+}
+
+.add-transaction-form__currency-select {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  background-color: white;
+  cursor: pointer;
+}
