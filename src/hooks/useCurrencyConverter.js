@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 
 function useCurrencyConverter() {
+  console.log('🔄 useCurrencyConverter - v2 - Using direct Frankfurter API');
   const [rates, setRates] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
