@@ -1,4 +1,4 @@
-const API_URL = 'https://moneyflow-backend-zybb.onrender.com';
+const API_URL = 'https://moneyflow-backend-zybb.onrender.com/api';
 
 // Obtener el token del localStorage
 const getToken = () => {
