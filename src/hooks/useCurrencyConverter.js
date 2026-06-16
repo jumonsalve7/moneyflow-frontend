@@ -11,7 +11,7 @@ function useCurrencyConverter() {
     setError(null);
     
     try {
-      const response = await fetch('/api/frankfurter/latest?from=USD');
+      const response = await fetch('https://api.frankfurter.app/latest?from=USD');
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -58,22 +58,19 @@ function useCurrencyConverter() {
     fetchRates();
     const interval = setInterval(fetchRates, 60 * 60 * 1000);
     return () => clearInterval(interval);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ✅ CONVERSIÓN ASÍNCRONA (con llamada a la API)
+  // ✅ CONVERSIÓN ASÍNCRONA - Usa Frankfurter API directamente (sin proxy)
   const convertCurrency = async (amount, fromCurrency, toCurrency) => {
     // Si no hay rates o son la misma moneda
     if (!rates) return amount;
     if (fromCurrency === toCurrency) return amount;
-    
-    // Si la cantidad es 0
     if (amount === 0) return 0;
     
     try {
-      // Intentar obtener tasa de cambio actualizada
+      // ✅ Usar Frankfurter API directamente (sin proxy)
       const response = await fetch(
-        `/api/frankfurter/latest?from=${fromCurrency}&to=${toCurrency}`
+        `https://api.frankfurter.app/latest?from=${fromCurrency}&to=${toCurrency}`
       );
       
       if (!response.ok) {
@@ -104,7 +101,7 @@ function useCurrencyConverter() {
     }
   };
 
-  // Conversión síncrona para cálculos rápidos (sin API)
+  // ✅ Conversión síncrona para cálculos rápidos (sin API)
   const quickConvert = (amount, fromCurrency, toCurrency) => {
     if (!rates) return amount;
     if (fromCurrency === toCurrency) return amount;
@@ -148,8 +145,8 @@ function useCurrencyConverter() {
     loading,
     error,
     lastUpdate,
-    convertCurrency,    // ✅ Asíncrono (para conversiones precisas con API)
-    quickConvert,      // ✅ Síncrono (para cálculos rápidos)
+    convertCurrency,
+    quickConvert,
     formatCurrency,
     refreshRates: fetchRates
   };
